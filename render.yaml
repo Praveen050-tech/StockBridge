@@ -1,0 +1,31 @@
+services:
+  # Backend API Node.js Service
+  - type: web
+    name: stockbridge-backend
+    env: node
+    buildCommand: "cd server && npm install && npm run prisma:generate"
+    startCommand: "cd server && npm start"
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+
+  # Frontend React (Vite) Static Site
+  - type: web
+    name: stockbridge-frontend
+    env: static
+    buildCommand: "cd client && npm install && npm run build"
+    staticPublishPath: "./client/dist"
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: stockbridge-backend
+          envVarKey: RENDER_EXTERNAL_URL
